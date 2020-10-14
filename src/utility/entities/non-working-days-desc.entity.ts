@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { NonWorkingDays } from "src/restourant/entities/non-working-days.entity";
 
 @Index("Description_Unique", ["description"], { unique: true })
 @Entity("non_working_days_desc", { schema: "restourants" })
@@ -8,4 +9,10 @@ export class NonWorkingDaysDesc {
 
   @Column("varchar", { name: "description", unique: true, length: 32 })
   description: string;
+
+  @OneToMany(
+    () => NonWorkingDays,
+    (nonWorkingDays) => nonWorkingDays.description
+  )
+  nonWorkingDays: NonWorkingDays[];
 }

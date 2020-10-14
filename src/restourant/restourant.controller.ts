@@ -8,6 +8,8 @@ import { JwtSecret } from 'config/jwt.secret';
 import { JwtDataDto } from 'src/middlewares/dto/jwt-data.dto';
 import { ApiResponse } from 'src/api-response/api-response';
 import { AddTablesDto } from './dto/add-tables.dto';
+import { AddWorkingTimesDto } from './dto/add-working-times.dto';
+import { AddNonWorkingDaysDto } from './dto/add-non-working-days.dto';
 
 @Controller('restourant')
 export class RestourantController {
@@ -30,5 +32,19 @@ export class RestourantController {
         @Body() addTablesDto: AddTablesDto
     ): Promise<ApiResponse> {
         return this.restourantService.addTables(addTablesDto);
+    }
+
+    @Post('working-time/add')
+    addWorkingTime(
+        @Body() addWorkingTimesDto: AddWorkingTimesDto
+    ): Promise<ApiResponse> {
+        return this.restourantService.addWorkingTime(addWorkingTimesDto);
+    }
+
+    @Post('non-working-days/add')
+    addNonWorkingDays(
+        @Body() addNonWorkingDaysDto: AddNonWorkingDaysDto
+    ): Promise<ApiResponse> {
+        return this.restourantService.addNonWorkingDays(addNonWorkingDaysDto);
     }
 }

@@ -10,6 +10,7 @@ import {
 import { RestourantTables } from "./restourant-tables.entity";
 import { RestourantWorkingHours } from "./restourant-working-hours.entity";
 import { Manager } from "src/manager/entities/manager.entity";
+import { NonWorkingDays } from "./non-working-days.entity";
 
 @Index("manager_id", ["managerId"], {})
 @Index("name_unique", ["name"], { unique: true })
@@ -35,6 +36,12 @@ export class Restourant {
 
   @Column("varchar", { name: "photo", nullable: true, length: 128 })
   photo: string | null;
+
+  @OneToMany(
+    () => NonWorkingDays,
+    (nonWorkingDays) => nonWorkingDays.restaurant
+  )
+  nonWorkingDays: NonWorkingDays[];
 
   @ManyToOne(() => Manager, (manager) => manager.restourants, {
     onDelete: "RESTRICT",

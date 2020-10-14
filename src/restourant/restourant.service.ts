@@ -6,6 +6,11 @@ import { Repository } from 'typeorm';
 import { ApiResponse } from 'src/api-response/api-response';
 import { AddTablesDto } from './dto/add-tables.dto';
 import { RestourantTables } from './entities/restourant-tables.entity';
+import { WorkingTime } from './dto/working-time.dto';
+import { RestourantWorkingHours } from './entities/restourant-working-hours.entity';
+import { AddWorkingTimesDto } from './dto/add-working-times.dto';
+import { AddNonWorkingDaysDto } from './dto/add-non-working-days.dto';
+import { NonWorkingDays } from './entities/non-working-days.entity';
 
 @Injectable()
 export class RestourantService {
@@ -13,7 +18,11 @@ export class RestourantService {
         @InjectRepository(Restourant)
         private readonly restourantRepository: Repository<Restourant>,
         @InjectRepository(RestourantTables)
-        private readonly restourantTablesRepository: Repository<RestourantTables>
+        private readonly restourantTablesRepository: Repository<RestourantTables>,
+        @InjectRepository(RestourantWorkingHours)
+        private readonly restourantWorkingHoursRepository: Repository<RestourantWorkingHours>,
+        @InjectRepository(NonWorkingDays)
+        private readonly restourantNonWorkingDaysRepository: Repository<NonWorkingDays>
     ) { }
 
     async addRestourant(addRestourant: AddRestourant, managerId: number): Promise<ApiResponse> {
@@ -62,6 +71,58 @@ export class RestourantService {
             });
             const addedTables = await this.restourantTablesRepository.save(tablesToAdd);
             apiResponse.data = addedTables; // success
+        }
+        catch (err) {
+            apiResponse.status = 'error';
+            apiResponse.statusCode = -3100;
+            apiResponse.message = err.message;
+        }
+        finally {
+            return Promise.resolve(apiResponse);
+        }
+    }
+
+    async addWorkingTime(addWorkingTimesDto: AddWorkingTimesDto): Promise<ApiResponse> {
+        const apiResponse = new ApiResponse();
+        try {
+            let workingHoursToAdd: RestourantWorkingHours[] = []; // workingHoursToAdd niz koji se ubacuje u bazu, pre toga ga je potrebno popuniti podacima
+            addWorkingTimesDto.workingTimes.forEach(wt => { // punjenje niza workingHoursToAdd
+                const newWorkingHour = new RestourantWorkingHours();
+                newWorkingHour.restourantId = wt.restourantId;
+                newWorkingHour.openingTime = wt.openingTime;
+                newWorkingHour.closingTime = wt.closingTime;
+                newWorkingHour.dayOfWeekId = wt.dayOfWeekId;
+                if (wt.isWorking !== undefined) {
+                    newWorkingHour.isWorking = wt.isWorking;
+                }
+                workingHoursToAdd = [...workingHoursToAdd, newWorkingHour];
+            });
+            const addedWorkingHours = await this.restourantWorkingHoursRepository.save(workingHoursToAdd);
+            apiResponse.data = addedWorkingHours; // success
+        }
+        catch (err) {
+            apiResponse.status = 'error';
+            apiResponse.statusCode = -3100;
+            apiResponse.message = err.message;
+        }
+        finally {
+            return Promise.resolve(apiResponse);
+        }
+    }
+
+    async addNonWorkingDays(addNonWorkingDaysDto: AddNonWorkingDaysDto): Promise<ApiResponse> {
+        const apiResponse = new ApiResponse();
+        try {
+            let nonWorkingDaysToAdd: NonWorkingDays[] = []; // workingHoursToAdd niz koji se ubacuje u bazu, pre toga ga je potrebno popuniti podacima
+            addNonWorkingDaysDto.nonWorkingDays.forEach(nwd => { // punjenje niza workingHoursToAdd
+                const newNonWorkingDay = new NonWorkingDays();
+                newNonWorkingDay.restaurantId = nwd.restourantId;
+                newNonWorkingDay.descriptionId = nwd.descriptionId;
+                newNonWorkingDay.date = nwd.date;
+                nonWorkingDaysToAdd = [...nonWorkingDaysToAdd, newNonWorkingDay];
+            });
+            const addedNonWorkingDays = await this.restourantNonWorkingDaysRepository.save(nonWorkingDaysToAdd);
+            apiResponse.data = addedNonWorkingDays; // success
         }
         catch (err) {
             apiResponse.status = 'error';
