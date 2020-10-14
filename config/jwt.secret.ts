@@ -1,1 +1,1 @@
-export const JwtSecret = 'our_secret_code132654789aaa';
+export const JwtSecret = 'restourants2020_123'; // secret code for jwt authorization
