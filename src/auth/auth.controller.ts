@@ -45,7 +45,7 @@ export class AuthController {
 
         // login succes -> create and send back JWT token
         const jwtData = new JwtDataUserDto();
-        jwtData.userId = manager.id;
+        jwtData.id = manager.id;
         jwtData.email = manager.email;
         jwtData.ip = req.ip;
         jwtData.ua = req.headers['user-agent'];

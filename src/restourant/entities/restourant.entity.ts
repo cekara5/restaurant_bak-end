@@ -12,6 +12,7 @@ import { RestourantWorkingHours } from "./restourant-working-hours.entity";
 import { Manager } from "src/manager/entities/manager.entity";
 
 @Index("manager_id", ["managerId"], {})
+@Index("name_unique", ["name"], { unique: true })
 @Entity("restourant", { schema: "restourants" })
 export class Restourant {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })

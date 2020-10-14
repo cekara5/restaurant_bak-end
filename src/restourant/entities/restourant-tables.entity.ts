@@ -34,7 +34,7 @@ export class RestourantTables {
   capacity: number;
 
   @Column("tinyint", { name: "max_hours_available", width: 1 })
-  maxHoursAvailable: boolean;
+  maxHoursAvailable: number;
 
   @OneToMany(() => Reservation, (reservation) => reservation.table)
   reservations: Reservation[];
