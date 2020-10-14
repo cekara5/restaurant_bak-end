@@ -1,5 +1,5 @@
 export class JwtDataUserDto {
-  userId: number; // manager id
+  id: number; // manager id
   email: string; // manager email
   ip: string;
   ua: string;
