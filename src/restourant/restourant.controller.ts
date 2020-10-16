@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get, Param, Query } from '@nestjs/common';
 import { Restourant } from './entities/restourant.entity';
 import { AddRestourant } from './dto/add-restourant.dto';
 import { RestourantService } from './restourant.service';
@@ -10,10 +10,22 @@ import { ApiResponse } from 'src/api-response/api-response';
 import { AddTablesDto } from './dto/add-tables.dto';
 import { AddWorkingTimesDto } from './dto/add-working-times.dto';
 import { AddNonWorkingDaysDto } from './dto/add-non-working-days.dto';
+import { FindAvailableTablesDto } from './dto/find-available-tables.dto';
 
 @Controller('restourant')
 export class RestourantController {
     constructor(private readonly restourantService: RestourantService) { }
+
+    // get all restaurants [from city with 'cityId']
+    @Get('find')
+    findAllRestaurants(@Query('cityId') cityId: number): Promise<ApiResponse> {
+        return this.restourantService.findAllRestourants(cityId);
+    }
+
+    @Post('available-tables')
+    findAvailableTables(@Body() findAvailableTablesDto: FindAvailableTablesDto): Promise<ApiResponse> {
+        return this.restourantService.findAvailableTables(findAvailableTablesDto);
+    }
 
     @Post('add')
     addRestourant(

@@ -18,7 +18,7 @@ export class DayOfWeek {
   name: string;
 
   @Column("tinyint", { name: "ordinal_number", unique: true, width: 1 })
-  ordinalNumber: boolean;
+  ordinalNumber: number;
 
   @OneToMany(
     () => RestourantWorkingHours,

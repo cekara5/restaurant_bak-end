@@ -40,6 +40,9 @@ export class Reservation {
   @Column("time", { name: "untill_time" })
   untillTime: string;
 
+  @Column("date", { name: "reservation_date" })
+  reservationDate: string;
+
   @ManyToOne(
     () => RestourantTables,
     (restourantTables) => restourantTables.reservations,

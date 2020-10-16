@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AddRestourant } from './dto/add-restourant.dto';
 import { Restourant } from './entities/restourant.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, createQueryBuilder, getRepository } from 'typeorm';
 import { ApiResponse } from 'src/api-response/api-response';
 import { AddTablesDto } from './dto/add-tables.dto';
 import { RestourantTables } from './entities/restourant-tables.entity';
@@ -11,6 +11,11 @@ import { RestourantWorkingHours } from './entities/restourant-working-hours.enti
 import { AddWorkingTimesDto } from './dto/add-working-times.dto';
 import { AddNonWorkingDaysDto } from './dto/add-non-working-days.dto';
 import { NonWorkingDays } from './entities/non-working-days.entity';
+import { getOpeningDetails } from 'src/_functions/check-times';
+import { RestourantInfo } from './dto/restourant-info.dto';
+import { DayOfWeek } from 'src/utility/entities/day-of-week.entity';
+import { FindAvailableTablesDto } from './dto/find-available-tables.dto';
+import { Reservation } from 'src/reservations/entities/reservation.entity';
 
 @Injectable()
 export class RestourantService {
@@ -22,8 +27,42 @@ export class RestourantService {
         @InjectRepository(RestourantWorkingHours)
         private readonly restourantWorkingHoursRepository: Repository<RestourantWorkingHours>,
         @InjectRepository(NonWorkingDays)
-        private readonly restourantNonWorkingDaysRepository: Repository<NonWorkingDays>
+        private readonly restourantNonWorkingDaysRepository: Repository<NonWorkingDays>,
+        @InjectRepository(DayOfWeek)
+        private readonly dayOfWeekRepository: Repository<DayOfWeek>
     ) { }
+
+    // get short info about all restaurants from city with :id
+    async findAllRestourants(cityId?: number): Promise<ApiResponse> {
+        const apiResponse = new ApiResponse();
+        let options: any = {
+            // select: ["name", "address", "name", "address", "name", "address",],
+            relations: ['city', 'nonWorkingDays', 'restourantTables', 'restourantWorkingHours']
+        };
+        if (cityId !== undefined) {
+            options = { ...options, where: { cityId: cityId } };
+        }
+        const daysOfWeek = await this.dayOfWeekRepository.find();
+        const restourantsInfo = await this.restourantRepository.find(options);
+        let response: RestourantInfo[] = [];
+        const timeWithTimezone = new Date().toLocaleString();
+        restourantsInfo.forEach(ri => {
+            const restourantInfo = new RestourantInfo();
+            restourantInfo.name = ri.name;
+            restourantInfo.city = ri.city.name;
+            restourantInfo.address = ri.address;
+            restourantInfo.openingDetails = getOpeningDetails(
+                new Date(timeWithTimezone),
+                ri.restourantWorkingHours,
+                ri.nonWorkingDays,
+                daysOfWeek,
+                false
+            );
+            response = [...response, restourantInfo];
+        })
+        apiResponse.data = response;
+        return Promise.resolve(apiResponse);
+    }
 
     async addRestourant(addRestourant: AddRestourant, managerId: number): Promise<ApiResponse> {
         const apiResponse = new ApiResponse();
@@ -54,6 +93,75 @@ export class RestourantService {
         finally {
             return Promise.resolve(apiResponse);
         }
+    }
+
+    async findAvailableTables(findAvailableTablesDto: FindAvailableTablesDto): Promise<ApiResponse> {
+        const apiResponse = new ApiResponse();
+
+        const reservedTables = await getRepository(RestourantTables)
+            // dohvataju se svi rezervisani stolovi u zeljenom trenutku rezervacije
+            .createQueryBuilder("tables")
+            .innerJoinAndSelect("tables.reservations", "reservation", "tables.restourantId = :id", { id: findAvailableTablesDto.restourantId })
+            .where("reservation.statusId = :statusId", { statusId: 2 }) // odobrena
+            .andWhere("reservation.fromTime <= :fromTime", { fromTime: findAvailableTablesDto.fromTime }) // nije odobrena
+            .andWhere("reservation.untillTime >= :fromTime", { fromTime: findAvailableTablesDto.fromTime })
+            .andWhere("reservation.reservationDate = :date", { date: findAvailableTablesDto.reservationDate })
+            .select("tables.id")
+            .getMany();
+
+        let arrayWithIdsOfReservedTables = [];
+
+        reservedTables.forEach(rt => arrayWithIdsOfReservedTables = [...arrayWithIdsOfReservedTables, rt.id]);
+        console.log(arrayWithIdsOfReservedTables);
+        if (arrayWithIdsOfReservedTables.length === 0) {
+            arrayWithIdsOfReservedTables = ['asd']; // u slucaju da je prazan niz puca linija sa NOT IN()->zato stavljamo bilo sta sto ne moze nikada biti id
+        }
+        // dohvataju se svi raspolozivi stolovi u zeljenom trenutku
+        const restourantTables = await getRepository(RestourantTables)
+            .createQueryBuilder("tables")
+            .where("tables.restourantId = :id", { id: findAvailableTablesDto.restourantId })
+            .andWhere("tables.id NOT IN (:...reserved)", { reserved: arrayWithIdsOfReservedTables })
+            .getMany();
+
+        const reservedTablesLater = await getRepository(RestourantTables)
+            // dohvataju se svi rezervisani stolovi koji imaju rezervaciju kasnije tog dana
+            .createQueryBuilder("tables")
+            .innerJoinAndSelect("tables.reservations", "reservation", "tables.restourantId = :id", { id: findAvailableTablesDto.restourantId })
+            .where("reservation.statusId = :statusId", { statusId: 2 }) // odobrena
+            .andWhere("reservation.fromTime > :fromTime", { fromTime: findAvailableTablesDto.fromTime }) // nije odobrena
+            .andWhere("reservation.reservationDate = :date", { date: findAvailableTablesDto.reservationDate })
+            //.select("tables.id")
+            .getMany();
+
+        // prolazak kroz sve slobodne stolove->prolazak kroz sve rezervisane kasnije->trazenje prve sledece rezervacije i po potrebi azuriranje maxHrsAvailable polja
+        restourantTables.forEach(rt => {
+            reservedTablesLater.forEach(rtl => {
+                if (rt.id === rtl.id) {
+                    const reservationFromTimeInMins = parseInt(findAvailableTablesDto.fromTime.split(":")[0]) * 60 + parseInt(findAvailableTablesDto.fromTime.split(":")[1]);
+                    let fromTimeReservedTable: number = null; // vreme pocetka prve sledece rezervacije
+                    // prodji kroz sve rezervacije datog stola i nadju najblizu ovoj rezervaciji po vremenu
+                    rtl.reservations.forEach(res => {
+                        const fromTimeReservedTableInMins = parseInt(res.fromTime.split(":")[0]) * 60 + parseInt(res.fromTime.split(":")[1]);
+                        console.log(fromTimeReservedTableInMins)
+                        console.log(reservationFromTimeInMins)
+                        if (reservationFromTimeInMins < fromTimeReservedTableInMins && (!fromTimeReservedTable || fromTimeReservedTableInMins < fromTimeReservedTable)) {
+                            fromTimeReservedTable = fromTimeReservedTableInMins;
+                        }
+                    });
+                    console.log(fromTimeReservedTable)
+                    if (fromTimeReservedTable !== null) {
+                        const differnceInHrs = (fromTimeReservedTable - reservationFromTimeInMins) / 60;
+                        console.log(differnceInHrs)
+                        if (rt.maxHoursAvailable > differnceInHrs) {
+                            rt.maxHoursAvailable = differnceInHrs;
+                        }
+                    }
+                }
+            })
+        })
+
+        apiResponse.data = restourantTables;
+        return Promise.resolve(apiResponse);
     }
 
     async addTables(addTablesDto: AddTablesDto): Promise<ApiResponse> {
@@ -119,6 +227,9 @@ export class RestourantService {
                 newNonWorkingDay.restaurantId = nwd.restourantId;
                 newNonWorkingDay.descriptionId = nwd.descriptionId;
                 newNonWorkingDay.date = nwd.date;
+                if (nwd.userDescription != undefined) {
+                    newNonWorkingDay.userDescription = nwd.userDescription;
+                }
                 nonWorkingDaysToAdd = [...nonWorkingDaysToAdd, newNonWorkingDay];
             });
             const addedNonWorkingDays = await this.restourantNonWorkingDaysRepository.save(nonWorkingDaysToAdd);

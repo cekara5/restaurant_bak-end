@@ -18,6 +18,9 @@ export class NonWorkingDays {
   @Column("int", { name: "description_id" })
   descriptionId: number;
 
+  @Column("text", { name: "user_description", nullable: true })
+  userDescription: string | null;
+
   @ManyToOne(() => Restourant, (restourant) => restourant.nonWorkingDays, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",

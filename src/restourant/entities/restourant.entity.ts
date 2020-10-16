@@ -11,7 +11,9 @@ import { RestourantTables } from "./restourant-tables.entity";
 import { RestourantWorkingHours } from "./restourant-working-hours.entity";
 import { Manager } from "src/manager/entities/manager.entity";
 import { NonWorkingDays } from "./non-working-days.entity";
+import { City } from "src/utility/entities/city.entity";
 
+@Index("city_id", ["cityId"], {})
 @Index("manager_id", ["managerId"], {})
 @Index("name_unique", ["name"], { unique: true })
 @Entity("restourant", { schema: "restourants" })
@@ -49,6 +51,13 @@ export class Restourant {
   })
   @JoinColumn([{ name: "manager_id", referencedColumnName: "id" }])
   manager: Manager;
+
+  @ManyToOne(() => City, (city) => city.restourants, {
+    onDelete: "RESTRICT",
+    onUpdate: "RESTRICT",
+  })
+  @JoinColumn([{ name: "city_id", referencedColumnName: "id" }])
+  city: City;
 
   @OneToMany(
     () => RestourantTables,

@@ -14,7 +14,7 @@ export class ReservationStatus {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
-  @Column("varchar", { name: "description", unique: true, length: 12 })
+  @Column("varchar", { name: "description", unique: true, length: 20 })
   description: string;
 
   @Column("tinyint", { name: "code", unique: true, width: 1 })

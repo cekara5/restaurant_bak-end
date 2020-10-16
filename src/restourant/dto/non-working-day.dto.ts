@@ -12,4 +12,6 @@ export class NonWorkingDayDto {
     @Validator.IsNotEmpty()
     @Validator.IsInt()
     descriptionId: number;
+
+    userDescription?: string;
 }
