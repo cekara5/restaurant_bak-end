@@ -10,7 +10,8 @@ export class AddRestourant {
     @Validator.MaxLength(64)
     address: string;
 
-    @Validator.IsInt()
+    //@Validator.IsNumberString()
+    @Validator.IsNotEmpty()
     cityId: number;
 
     photo?: string;
