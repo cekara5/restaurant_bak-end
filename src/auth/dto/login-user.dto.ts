@@ -5,5 +5,6 @@ export class LoginUserDto {
   email: string;
 
   @Validator.IsNotEmpty()
+  @Validator.Length(4, 32)
   password: string;
 }
