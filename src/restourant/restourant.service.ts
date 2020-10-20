@@ -33,13 +33,15 @@ export class RestourantService {
     ) { }
 
     // get short info about all restaurants from city with :id
-    async findAllRestourants(cityId?: number): Promise<ApiResponse> {
+    async findAllRestourants(cityId?: number, restaurantId?: number): Promise<ApiResponse> {
         const apiResponse = new ApiResponse();
         let options: any = {
             // select: ["name", "address", "name", "address", "name", "address",],
             relations: ['city', 'nonWorkingDays', 'restourantTables', 'restourantWorkingHours']
         };
-        if (cityId !== undefined) {
+        if (restaurantId !== undefined) {
+            options = { ...options, where: { id: restaurantId } };
+        } else if (cityId !== undefined) {
             options = { ...options, where: { cityId: cityId } };
         }
         const daysOfWeek = await this.dayOfWeekRepository.find();
@@ -48,6 +50,7 @@ export class RestourantService {
         const timeWithTimezone = new Date().toLocaleString();
         restourantsInfo.forEach(ri => {
             const restourantInfo = new RestourantInfo();
+            restourantInfo.id = ri.id;
             restourantInfo.name = ri.name;
             restourantInfo.city = ri.city.name;
             restourantInfo.address = ri.address;
@@ -58,6 +61,9 @@ export class RestourantService {
                 daysOfWeek,
                 false
             );
+            restourantInfo.nonWorkingDays = ri.nonWorkingDays;
+            restourantInfo.workingTimes = ri.restourantWorkingHours;
+            restourantInfo.tables = ri.restourantTables;
             response = [...response, restourantInfo];
         })
         apiResponse.data = response;
@@ -78,7 +84,7 @@ export class RestourantService {
             if (nameTaken) {
                 apiResponse.status = 'error';
                 apiResponse.statusCode = -3101;
-                apiResponse.message = 'Restourant name isa already taken!';
+                apiResponse.message = 'Restourant name is already taken!';
             }
             else {
                 const addedRestourant = await this.restourantRepository.save(restourantToAdd);
@@ -97,6 +103,34 @@ export class RestourantService {
 
     async findAvailableTables(findAvailableTablesDto: FindAvailableTablesDto): Promise<ApiResponse> {
         const apiResponse = new ApiResponse();
+
+        // prvo proveriti da li restoran radi u datom vremenu
+        const date = new Date(findAvailableTablesDto.reservationDate);
+        const hh = parseInt(findAvailableTablesDto.fromTime.split(":")[0]);
+        const mm = parseInt(findAvailableTablesDto.fromTime.split(":")[1]);
+
+        const timeToCheck = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hh, mm);
+
+        const daysOfWeek = await this.dayOfWeekRepository.find();
+        const options: any = {
+            relations: ['nonWorkingDays', 'restourantWorkingHours']
+        };
+        const restourantInfo = await this.restourantRepository.findOne(findAvailableTablesDto.restourantId, options);
+        console.log('log ' + timeToCheck)
+        const openingDetails = getOpeningDetails(
+            new Date(timeToCheck),
+            restourantInfo.restourantWorkingHours,
+            restourantInfo.nonWorkingDays,
+            daysOfWeek,
+            false
+        );
+        if (!openingDetails.isOpened) { // zatvoren
+            apiResponse.data = {
+                isOpened: false,
+                tables: []
+            };
+            return Promise.resolve(apiResponse);
+        }
 
         const reservedTables = await getRepository(RestourantTables)
             // dohvataju se svi rezervisani stolovi u zeljenom trenutku rezervacije
@@ -119,6 +153,7 @@ export class RestourantService {
         // dohvataju se svi raspolozivi stolovi u zeljenom trenutku
         const restourantTables = await getRepository(RestourantTables)
             .createQueryBuilder("tables")
+            .innerJoinAndSelect("tables.description", "description")
             .where("tables.restourantId = :id", { id: findAvailableTablesDto.restourantId })
             .andWhere("tables.id NOT IN (:...reserved)", { reserved: arrayWithIdsOfReservedTables })
             .getMany();
@@ -159,8 +194,11 @@ export class RestourantService {
                 }
             })
         })
-
-        apiResponse.data = restourantTables;
+        apiResponse.data = {
+            isOpened: true,
+            tables: restourantTables
+        };
+        //apiResponse.data = restourantTables;
         return Promise.resolve(apiResponse);
     }
 

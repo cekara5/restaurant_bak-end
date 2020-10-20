@@ -21,6 +21,10 @@ export class RestourantController {
     findAllRestaurants(@Query('cityId') cityId: number): Promise<ApiResponse> {
         return this.restourantService.findAllRestourants(cityId);
     }
+    @Get(':id')
+    findRestaurant(@Param('id') id: number): Promise<ApiResponse> {
+        return this.restourantService.findAllRestourants(0, id); // finds restaurant with given id
+    }
 
     @Post('available-tables')
     findAvailableTables(@Body() findAvailableTablesDto: FindAvailableTablesDto): Promise<ApiResponse> {

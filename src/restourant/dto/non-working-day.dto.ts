@@ -2,7 +2,7 @@ import * as Validator from "class-validator";
 
 export class NonWorkingDayDto {
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     restourantId: number;
 
     @Validator.IsNotEmpty()
@@ -10,7 +10,7 @@ export class NonWorkingDayDto {
     date: string;
 
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     descriptionId: number;
 
     userDescription?: string;

@@ -2,22 +2,22 @@ import * as Validator from 'class-validator'
 
 export class Table {
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     restourantId: number;
 
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     number: number;
 
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     descriptionId: number;
 
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     capacity: number;
 
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     maxHoursAvailable: number;
 }

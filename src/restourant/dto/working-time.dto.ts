@@ -1,11 +1,11 @@
 import * as Validator from "class-validator";
 export class WorkingTime {
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     restourantId: number;
 
     @Validator.IsNotEmpty()
-    @Validator.IsInt()
+    //@Validator.IsInt()
     dayOfWeekId: number;
 
     @Validator.IsNotEmpty()
