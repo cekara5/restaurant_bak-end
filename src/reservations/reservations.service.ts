@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ApiResponse } from 'src/api-response/api-response';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { Reservation } from './entities/reservation.entity';
 import { AddReservation } from './dto/add-reservation.dto';
 import { ReservationStatus } from 'src/utility/entities/reservation-status.entity';
 import { response } from 'express';
+import { SelectQueryBuilder } from 'typeorm/query-builder/SelectQueryBuilder';
 
 @Injectable()
 export class ReservationsService {
@@ -16,12 +17,9 @@ export class ReservationsService {
         private readonly reservationStatusRepository: Repository<ReservationStatus>
     ) { }
 
-    async findAllReservations(statusCode?: number): Promise<ApiResponse> {
+    async findAllReservations(userId: number, statusCode?: number): Promise<ApiResponse> {
         const apiResponse = new ApiResponse();
-        let options: any = {
-            // select: ["name", "address", "name", "address", "name", "address",],
-            relations: ['table', 'status']
-        };
+        console.log(userId)
         if (statusCode !== undefined) {
             const reservationStatusWithCode = await this.reservationStatusRepository.findOne({ where: { code: statusCode } });
             if (!reservationStatusWithCode) {
@@ -30,15 +28,27 @@ export class ReservationsService {
                 apiResponse.message = "Status code is invalid!";
                 return Promise.resolve(apiResponse);
             }
-            options = { ...options, where: { statusId: reservationStatusWithCode.id } };
+            apiResponse.data = await getRepository(Reservation)
+                .createQueryBuilder("reservation")
+                .innerJoinAndSelect("reservation.status", "status")
+                .innerJoin("reservation.table", "table")
+                .innerJoin("table.restourant", "restourant", "restourant.managerId = :id", { id: userId })
+                .where("reservation.statusId = :id", { id: reservationStatusWithCode.id })
+                .getMany();
+            console.log(reservationStatusWithCode.id);
+        } else {
+            apiResponse.data = await getRepository(Reservation)
+                .createQueryBuilder("reservation")
+                .innerJoinAndSelect("reservation.status", "status")
+                .innerJoinAndSelect("reservation.table", "table")
+                .innerJoinAndSelect("table.restourant", "restourant", "restourant.managerId = :id", { id: userId })
+                .getMany();
         }
-        const reservations = await this.reservationRepository.find(options);
 
-        apiResponse.data = reservations;
         return Promise.resolve(apiResponse);
     }
 
-    async updateReservation(id: number, statusId: number): Promise<ApiResponse> {
+    async updateReservation(id: number, code: number): Promise<ApiResponse> {
         const apiResponse = new ApiResponse();
         const reservationToUpdate = await this.reservationRepository.findOne(id);
         if (!reservationToUpdate) {
@@ -47,7 +57,8 @@ export class ReservationsService {
             apiResponse.message = "Reservation with id:" + id + " doesn't exist!";
             return Promise.resolve(apiResponse);
         }
-        reservationToUpdate.statusId = statusId;
+        const reservationStatusWithCode = await this.reservationStatusRepository.findOne({ where: { code: code } });
+        reservationToUpdate.statusId = reservationStatusWithCode.id;
         const updatedReservation = await this.reservationRepository.save(reservationToUpdate);
         apiResponse.data = updatedReservation;
         return Promise.resolve(apiResponse);
