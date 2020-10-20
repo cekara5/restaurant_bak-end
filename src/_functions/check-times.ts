@@ -54,7 +54,7 @@ export function getOpeningDetails(
     let openingDay: string = null;
     let closingTime: string = null;
     if (isOpened) {
-        closingTime = todaysWorkingTime.closingTime.split(':')[0] + ":" + todaysWorkingTime.closingTime.split(':')[1];
+        closingTime = todaysWorkingTime.closingTime;
     }
     else { // if it is closed
         if (!nonWordkingDayToday) { // ako nije neradni dan
@@ -64,9 +64,15 @@ export function getOpeningDetails(
                 const yesterdayClosingTimeInHrs = (parseInt(yesterdayWorkingTime.closingTime.split(':')[0]));
                 const yesterdayClosingTimeMins = (parseInt(yesterdayWorkingTime.closingTime.split(':')[1]));
                 const yesterdayClosingTimeInMins = yesterdayClosingTimeInHrs * 60 + yesterdayClosingTimeMins;
-                if (yesterdayClosingTimeInMins >= hrsNow * 60 + minsNow) { // ukoliko jeste zatvara se u yesterdayClosingTime
+                // treba nam i vreme otvaranja da bismo proverili da li je uopste juce restoran radio posle ponoci
+                // sto bi znacilo da je vreme zatvaranja manje od vremena otvaranja => yesterdayClosingTimeInMins < yesterdayOpeningTimeInMins
+                const yesterdayOpeningTimeInHrs = (parseInt(yesterdayWorkingTime.openingTime.split(':')[0]));
+                const yesterdayOpeningTimeMins = (parseInt(yesterdayWorkingTime.openingTime.split(':')[1]));
+                const yesterdayOpeningTimeInMins = yesterdayOpeningTimeInHrs * 60 + yesterdayOpeningTimeMins;
+
+                if (yesterdayClosingTimeInMins < yesterdayOpeningTimeInMins && yesterdayClosingTimeInMins >= hrsNow * 60 + minsNow) { // ukoliko jeste zatvara se u yesterdayClosingTime
                     isOpened = true;
-                    closingTime = yesterdayClosingTimeInHrs + ":" + yesterdayClosingTimeMins;
+                    closingTime = yesterdayWorkingTime.closingTime;
                 }
                 else { // trenutno zatvoren -> otvara se u danasnjih openingHrs
                     openingTime = todaysWorkingTime.openingTime.split(':')[0] + ":" + todaysWorkingTime.openingTime.split(':')[1];;
