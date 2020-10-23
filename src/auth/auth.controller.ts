@@ -11,12 +11,14 @@ import { JwtSecret } from 'config/jwt.secret';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { Manager } from 'src/manager/entities/manager.entity';
+import { RestourantService } from 'src/restourant/restourant.service';
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly managerService: ManagerService,
+        private readonly restourantService: RestourantService,
     ) { }
 
     @Post('manager/login')
@@ -43,18 +45,22 @@ export class AuthController {
             return Promise.resolve(apiResponse);
         }
 
+        const managersRestaurant = await this.restourantService.findManagersRestaurant(manager.id);
         // login succes -> create and send back JWT token
         const jwtData = new JwtDataUserDto();
         jwtData.id = manager.id;
         jwtData.email = manager.email;
         jwtData.ip = req.ip;
         jwtData.ua = req.headers['user-agent'];
+        //jwtData.restaurantId = managersRestaurant ? managersRestaurant.id : null;
         const token = await jwt.sign({ jwtData }, JwtSecret, { expiresIn: '2d' });
         const responseData = new LoginResponseDto();
         responseData.id = manager.id;
         responseData.email = manager.email;
         responseData.token = token;
+        responseData.restaurantId = managersRestaurant ? managersRestaurant.id : null;
         apiResponse.data = responseData;
+
         return Promise.resolve(apiResponse);
     }
 

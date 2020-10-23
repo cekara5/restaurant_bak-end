@@ -70,6 +70,11 @@ export class RestourantService {
         return Promise.resolve(apiResponse);
     }
 
+    async findManagersRestaurant(id: number): Promise<Restourant> {
+        return this.restourantRepository.findOne({ where: { managerId: id } });
+
+    }
+
     async addRestourant(addRestourant: AddRestourant, managerId: number): Promise<ApiResponse> {
         const apiResponse = new ApiResponse();
         try {
@@ -116,7 +121,6 @@ export class RestourantService {
             relations: ['nonWorkingDays', 'restourantWorkingHours']
         };
         const restourantInfo = await this.restourantRepository.findOne(findAvailableTablesDto.restourantId, options);
-        console.log('log ' + timeToCheck)
         const openingDetails = getOpeningDetails(
             new Date(timeToCheck),
             restourantInfo.restourantWorkingHours,
@@ -127,6 +131,7 @@ export class RestourantService {
         if (!openingDetails.isOpened) { // zatvoren
             apiResponse.data = {
                 isOpened: false,
+                message: "Restoran je u izabranom vrmenu zatvoren.",
                 tables: []
             };
             return Promise.resolve(apiResponse);
@@ -165,8 +170,10 @@ export class RestourantService {
             .where("reservation.statusId = :statusId", { statusId: 2 }) // odobrena
             .andWhere("reservation.fromTime > :fromTime", { fromTime: findAvailableTablesDto.fromTime }) // nije odobrena
             .andWhere("reservation.reservationDate = :date", { date: findAvailableTablesDto.reservationDate })
-            //.select("tables.id")
             .getMany();
+
+        console.log(restourantTables);
+        console.log(reservedTablesLater);
 
         // prolazak kroz sve slobodne stolove->prolazak kroz sve rezervisane kasnije->trazenje prve sledece rezervacije i po potrebi azuriranje maxHrsAvailable polja
         restourantTables.forEach(rt => {
@@ -177,13 +184,10 @@ export class RestourantService {
                     // prodji kroz sve rezervacije datog stola i nadju najblizu ovoj rezervaciji po vremenu
                     rtl.reservations.forEach(res => {
                         const fromTimeReservedTableInMins = parseInt(res.fromTime.split(":")[0]) * 60 + parseInt(res.fromTime.split(":")[1]);
-                        console.log(fromTimeReservedTableInMins)
-                        console.log(reservationFromTimeInMins)
                         if (reservationFromTimeInMins < fromTimeReservedTableInMins && (!fromTimeReservedTable || fromTimeReservedTableInMins < fromTimeReservedTable)) {
                             fromTimeReservedTable = fromTimeReservedTableInMins;
                         }
                     });
-                    console.log(fromTimeReservedTable)
                     if (fromTimeReservedTable !== null) {
                         const differnceInHrs = (fromTimeReservedTable - reservationFromTimeInMins) / 60;
                         console.log(differnceInHrs)

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -19,6 +19,10 @@ import { DayOfWeek } from './utility/entities/day-of-week.entity';
 import { NonWorkingDaysDesc } from './utility/entities/non-working-days-desc.entity';
 import { ReservationStatus } from './utility/entities/reservation-status.entity';
 import { TableDesc } from './utility/entities/table-desc.entity';
+import { AuthMiddleware } from './middlewares/auth.middleware';
+import { RestourantController } from './restourant/restourant.controller';
+import { ReservationsController } from './reservations/reservations.controller';
+import { ManagerController } from './manager/manager.controller';
 
 @Module({
   imports: [
@@ -53,4 +57,16 @@ import { TableDesc } from './utility/entities/table-desc.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude(
+        { path: 'restourant/find', method: RequestMethod.GET },
+        { path: 'restourant/:id', method: RequestMethod.GET },
+        { path: 'restourant/available-tables', method: RequestMethod.POST },
+        { path: 'reservations/add', method: RequestMethod.POST }
+      )
+      .forRoutes(RestourantController, ReservationsController, ManagerController);
+  }
+}

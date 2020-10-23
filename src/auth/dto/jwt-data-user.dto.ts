@@ -3,4 +3,5 @@ export class JwtDataUserDto {
   email: string; // manager email
   ip: string;
   ua: string;
+  restaurantId?: number;
 }

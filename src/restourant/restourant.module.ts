@@ -17,6 +17,7 @@ import { DayOfWeek } from 'src/utility/entities/day-of-week.entity';
     DayOfWeek
   ])],
   controllers: [RestourantController],
-  providers: [RestourantService]
+  providers: [RestourantService],
+  exports: [RestourantService]
 })
 export class RestourantModule { }
