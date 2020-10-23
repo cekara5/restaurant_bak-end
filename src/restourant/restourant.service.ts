@@ -213,7 +213,7 @@ export class RestourantService {
             addTablesDto.tables.forEach(table => { // punjenje niza tablesToAdd
                 const newTable = new RestourantTables();
                 newTable.restourantId = table.restourantId;
-                newTable.tableNumber = table.number;
+                newTable.tableNumber = table.tableNumber;
                 newTable.capacity = table.capacity;
                 newTable.descriptionId = table.descriptionId;
                 newTable.maxHoursAvailable = table.maxHoursAvailable;
