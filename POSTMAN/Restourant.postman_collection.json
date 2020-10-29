@@ -1,0 +1,799 @@
+{
+	"info": {
+		"_postman_id": "1653c609-09fe-4d27-829d-ad4ff356342e",
+		"name": "Restourant",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "utility",
+			"item": [
+				{
+					"name": "get all cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/utility/cities",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"utility",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all table descriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/utility/table-desc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"utility",
+								"table-desc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all days of week descriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/utility/days-of-week-desc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"utility",
+								"days-of-week-desc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all non working days descriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/utility/non-working-days-desc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"utility",
+								"non-working-days-desc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all reservation statuses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/utility/reservation-status-desc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"utility",
+								"reservation-status-desc"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "folder with request for getting all helper methods (Cities, Reservation statuses, Table descriptions...)",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Restaurant",
+			"item": [
+				{
+					"name": "add restourant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Little Bay\",\r\n    \"address\": \"Dositejeva 9a\",\r\n    \"cityId\": 1\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/restourant/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add tables",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tables\": [\r\n        {\r\n            \"restourantId\": 6,\r\n            \"number\": 1,\r\n            \"descriptionId\": 2,\r\n            \"capacity\": 4,\r\n            \"maxHoursAvailable\": 4\r\n        },\r\n        {\r\n            \"restourantId\": 6,\r\n            \"number\": 2,\r\n            \"descriptionId\": 3,\r\n            \"capacity\": 4,\r\n            \"maxHoursAvailable\": 4\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/restourant/tables/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"tables",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add working time",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workingTimes\": [\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 1,\r\n            \"openingTime\": \"10:00\",\r\n            \"closingTime\": \"00:00\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 2,\r\n            \"openingTime\": \"10:00\",\r\n            \"closingTime\": \"00:00\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 3,\r\n            \"openingTime\": \"10:00\",\r\n            \"closingTime\": \"00:00\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 4,\r\n            \"openingTime\": \"10:00\",\r\n            \"closingTime\": \"00:00\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 5,\r\n            \"openingTime\": \"10:00\",\r\n            \"closingTime\": \"02:00\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 6,\r\n            \"openingTime\": \"12:00\",\r\n            \"closingTime\": \"02:00\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"dayOfWeekId\": 7,\r\n            \"openingTime\": \"12:00\",\r\n            \"closingTime\": \"22:00\"\r\n        }\r\n    ]\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/restourant/working-time/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"working-time",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add non working days",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nonWorkingDays\": [\r\n        {\r\n            \"restourantId\": 3,\r\n            \"descriptionId\": 1,\r\n            \"date\": \"2020-01-01\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"descriptionId\": 2,\r\n            \"date\": \"2020-10-25\"\r\n        },\r\n        {\r\n            \"restourantId\": 3,\r\n            \"descriptionId\": 2,\r\n            \"date\": \"2020-10-26\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/restourant/non-working-days/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"non-working-days",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get restaurants info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/restourant/find?cityId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"find"
+							],
+							"query": [
+								{
+									"key": "cityId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get information about all restaurants or restaurants within the given city id as parameter (restourant/find?id=3)"
+					},
+					"response": []
+				},
+				{
+					"name": "get available tables",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"restourantId\": 3,\r\n    \"reservationDate\": \"2020-10-15\",\r\n    \"fromTime\": \"17:00\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/restourant/available-tables",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"available-tables"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get restaurant info with given id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/restourant/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"restourant",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Folder with all requests related with restaurant data, controlled by Manager mostly",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Reservations",
+			"item": [
+				{
+					"name": "add reservation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tableId\": 7,\r\n    \"name\": \"Nikola\",\r\n    \"lastName\": \"Nikilic\",\r\n    \"phone\": \"063255589\",\r\n    \"email\": \"nik.nik@gmail.com\",\r\n    \"fromTime\": \"19:00\",\r\n    \"untillTime\": \"20:00\",\r\n    \"reservationDate\": \"2020-10-18\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/reservations/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all reservations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/reservations/find",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"find"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all reservation with given statusId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/reservations/find?statusCode=0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"find"
+							],
+							"query": [
+								{
+									"key": "statusCode",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reject reservation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/reservations/reject/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"reservations",
+								"reject",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Folder contains all requests related to making reservations",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "manager register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Pera\",\r\n    \"lastName\": \"Perić\",\r\n    \"email\": \"manager@google.com\",\r\n    \"password\": \"manager123\",\r\n    \"confirmPassword\": \"manager123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/manager/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"manager",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "manager register - email already taken",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Pera\",\r\n    \"lastName\": \"Perić\",\r\n    \"email\": \"manager@google.com\",\r\n    \"password\": \"manager123\",\r\n    \"confirmPassword\": \"manager123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/auth/manager/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"manager",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "70"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"46-xZpIM97XIlta0z0LXAeOSQLl6Bc\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 14 Oct 2020 11:55:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"error\",\n    \"statusCode\": -3004,\n    \"message\": \"Email already taken!\"\n}"
+						},
+						{
+							"name": "manager register - successful",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Pera\",\r\n    \"lastName\": \"Perić\",\r\n    \"email\": \"manager@google.com\",\r\n    \"password\": \"manager123\",\r\n    \"confirmPassword\": \"manager123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/auth/manager/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"manager",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "114"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"72-NTMD05W6S75s3PevjIfHs3z8U6k\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 14 Oct 2020 11:53:41 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"statusCode\": 0,\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"Pera\",\n        \"lastName\": \"Perić\",\n        \"email\": \"manager@google.com\"\n    }\n}"
+						},
+						{
+							"name": "manager register - confirmation password failed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Pera\",\r\n    \"lastName\": \"Perić\",\r\n    \"email\": \"manager@google.com\",\r\n    \"password\": \"manager123\",\r\n    \"confirmPassword\": \"123manager123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/auth/manager/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"manager",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "82"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"52-xwsIcwQbinfqi0cJj3GxhBTG8tM\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 14 Oct 2020 11:54:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"error\",\n    \"statusCode\": -3003,\n    \"message\": \"Confirmed passwords aren't same!\"\n}"
+						}
+					]
+				},
+				{
+					"name": "manager login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"manager@google.com\",\r\n    \"password\": \"manager123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/manager/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"manager",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "manager login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"manager@google.com\",\r\n    \"password\": \"manager123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/auth/manager/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"manager",
+										"login"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "manager login - wrong email",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"wrong_email@google.com\",\r\n    \"password\": \"manager123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/auth/manager/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"manager",
+										"login"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3e-oH2D4+x3Ujf6cnv/NTF8uf7CCdk\""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 14 Oct 2020 11:49:48 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"error\",\n    \"statusCode\": -3001,\n    \"message\": \"Wrong email!\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Folder contains requests related to login and register",
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGcasdiOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqd3REYXRhIjp7ImlkIjoxLCJlbWFpbCI6Im1hbmFnZXJAZ21haWwuY29tIiwiaXAiOiI6OjEiLCJ1YSI6IlBvc3RtYW5SdW50aW1lLzcuMjYuNSJ9LCJpYXQiOjE2MDMyMTY0NjUsImV4cCI6MTYwMzM4OTI2NX0.dWguC2zQyOInOg97qFqGbrrD7KDF3ICRYMF-FtAwnug",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "fb5d9c99-4ac4-4f42-a031-f660691fdb91",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ff9b4d25-2a37-4ea3-bb99-30d0b3292f56",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

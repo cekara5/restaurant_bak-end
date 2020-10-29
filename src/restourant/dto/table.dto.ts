@@ -7,7 +7,7 @@ export class Table {
 
     @Validator.IsNotEmpty()
     //@Validator.IsInt()
-    number: number;
+    tableNumber: number;
 
     @Validator.IsNotEmpty()
     //@Validator.IsInt()
